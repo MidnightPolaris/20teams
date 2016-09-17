@@ -121,36 +121,37 @@ $(function(){
             $('<div>').addClass('mem').data('id', id).append(image(id)).appendTo(div);
         }
     });
-    $('#teams').on('click', '.mem', function(e){
-        $('body').trigger('mousedown');
-        e.stopPropagation();
-    }).popover({
+    $('#teams').popover({
         selector: '.mem',
         placement: 'bottom',
+        container: 'body',
         title: '',
-        content: $('.form-mem').clone().show().get(0).outerHTML,
-        html: true
-    }).on('click', '.mem', function(e){
-        $this = $(this);
-        $this.next('.popover')
-            .find('input')
-            .val($this.data('id'))
+        content: $('.form-mem').eq(-1).clone().show().get(0).outerHTML,
+        html: true,
+    });
+    $('#teams').on('inserted.bs.popover', '.mem', function(e){
+        var $this = $(this);
+        $(this).data('bs.popover').$tip
+        .find('input')
+            .val($(this).data('id'))
             .focus().select()
-        .end()
-            .find('form')
+            .end()
+        .find('form')
             .on('submit', function(e){
                 update($this, $(this).find('input').val());
+                $this.click();
                 check();
-                $this.popover('hide');
                 return !!e.preventDefault();
             })
-        .end().on('click', function(e){
+            .end()
+        .on('mousedown', function(e){
             e.stopPropagation();
         });
-        
-        $('body').one('mousedown', function(e){
-            $('.mem').popover('hide');
-        });
+    });
+    $('body').on('mousedown', function(){
+        if($('.popover').length){
+            $('.popover').data('bs.popover').$element.click();
+        }
     });
     
     // Pool
