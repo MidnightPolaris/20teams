@@ -14,8 +14,7 @@ function Repo(ns){
 }
 Repo.prototype.key = function(key, def){
     key = $.makeArray(key);
-    key.unshift('val');
-    var temp = this, last = key.pop();
+    var temp = this.val, last = key.pop();
     $.each(key, function(i,e){
         if(temp[e] === undefined)
             temp[e] = {};
@@ -31,6 +30,10 @@ Repo.prototype.key = function(key, def){
     }
 }
 Repo.prototype.flush = function(){ localStorage[this.ns] = JSON.stringify(this.val); }
+Repo.prototype.clear = function(){
+	this.val = {};
+	this.flush();
+}
 
 window.df = {};
 window.repo = new Repo('20teams');
@@ -38,41 +41,34 @@ function image(id){
     var img = $('<div>').addClass('spinner').append(
         $('<i>').addClass('fa fa-circle-o-notch fa-fw fa-3x fa-spin')
     );
-    if(df[id] === undefined){
-        var url = repo.key(['img', id])();
-        if(url !== undefined){
-            df[id] = $.Deferred().resolve(url);
-        }else{
-            df[id] = $.Deferred();
-            $.getJSON('//towerofsaviors.wikia.com/api.php?callback=?',{
-                format: 'json',
-                action: 'query',
-                titles: 'File:' + id + 'i.png',
-                prop: 'imageinfo',
-                iiprop: 'url'
-            }).then(function(d){
-                for(var k in d.query.pages){
-                    try{
-                        var url = d.query.pages[k].imageinfo[0].url;
-                        url = url.replace(/^\w+:\/\//, '//');
-                    }catch(e){
-                        console.log('Error: '+id);
-                        df[id].reject();
-                        return;
-                    }
-                    repo.key(['img', id])(url);
-                    repo.flush();
-                    df[id].resolve(url);
-                    return;
-                }
-            }, function(){ df[id].reject(); });
-        }
-    }
-    df[id].done(function(url){
-        $('<img>').attr('src', url).on('load', function(){ img.replaceWith(this); });
-    }).fail(function(){
-        $('<div>').addClass('error').append($('<i>').addClass('fa fa-times fa-fw fa-3x')).replaceAll(img);
-    });
+	if(df[id] === undefined){
+		df[id] = new Promise((resolve, reject) => {
+			resolve(repo.key(['img', id])() !== undefined
+				? repo.key(['img', id])()
+				: $.getJSON('//towerofsaviors.wikia.com/api.php?callback=?',{
+					format: 'json',
+					action: 'query',
+					titles: 'File:' + id + 'i.png',
+					prop: 'imageinfo',
+					iiprop: 'url'
+				}).then(d => {
+					for(var k in d.query.pages){
+						try{
+							return repo.key(['img', id])(d.query.pages[k].imageinfo[0].url);
+						}catch(e){
+							console.error('image('+id+')\n'+e);
+							throw e;
+						}
+					}
+				})
+			);
+		});
+	}
+	df[id].then(function(url){
+		$('<img>').attr('src', url).on('load', function(){ img.replaceWith(this); })
+	}).catch(function(){
+		$('<div>').addClass('error').append($('<i>').addClass('fa fa-times fa-fw fa-3x')).replaceAll(img)
+	});
     return img;
 }
 
