@@ -2,8 +2,9 @@
 <html>
 <head>
 <script type="text/javascript" src="//code.jquery.com/jquery-3.0.0.min.js"></script>
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+<script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
 
 <script type="text/javascript">
@@ -125,29 +126,23 @@ $(function(){
         content: $('.form-mem').eq(-1).clone().show().get(0).outerHTML,
         html: true,
     });
-    $('#teams').on('inserted.bs.popover', '.mem', function(e){
+    $('#teams').on('inserted.bs.popover', '.mem', function(){
         var $this = $(this);
-        $(this).data('bs.popover').$tip
-        .find('input')
+        $('.popover input')
             .val($(this).data('id'))
             .focus().select()
-            .end()
-        .find('form')
-            .on('submit', function(e){
-                update($this, $(this).find('input').val());
-                $this.click();
-                check();
-                return !!e.preventDefault();
-            })
-            .end()
-        .on('mousedown', function(e){
+        $('.popover form').on('submit', function(e){
+			update($this, $(this).find('input').val());
+			$('.popover').popover('hide');
+			check();
+			return !!e.preventDefault();
+		})
+        $('.popover').on('mousedown', function(e){
             e.stopPropagation();
         });
     });
     $('body').on('mousedown', function(){
-        if($('.popover').length){
-            $('.popover').data('bs.popover').$element.click();
-        }
+		$('.popover').popover('hide');
     });
     
     // Pool
@@ -338,70 +333,70 @@ body{ overflow: hidden; }
 <body>
 <div class='container-fluid wrapper'>
     <div class='row' id='teams'>
-        <div class='col-xs-12 col-sm-6'><div class='row'>
-            <div class='col-xs-12 col-lg-6'><div class='row'>
-                <div class='team col-xs-12' id='team01'><span>01</span></div>
-                <div class='team col-xs-12' id='team02'><span>02</span></div>
-                <div class='team col-xs-12' id='team03'><span>03</span></div>
-                <div class='team col-xs-12' id='team04'><span>04</span></div>
-                <div class='team col-xs-12' id='team05'><span>05</span></div>
-                <div class='team col-xs-12' id='team06'><span>06</span></div>
-                <div class='team col-xs-12' id='team07'><span>07</span></div>
-                <div class='team col-xs-12' id='team08'><span>08</span></div>
-                <div class='team col-xs-12' id='team09'><span>09</span></div>
-                <div class='team col-xs-12' id='team10'><span>10</span></div>
-            </div></div><div class='col-xs-12 col-lg-6'><div class='row'>
-                <div class='team col-xs-12' id='team11'><span>11</span></div>
-                <div class='team col-xs-12' id='team12'><span>12</span></div>
-                <div class='team col-xs-12' id='team13'><span>13</span></div>
-                <div class='team col-xs-12' id='team14'><span>14</span></div>
-                <div class='team col-xs-12' id='team15'><span>15</span></div>
-                <div class='team col-xs-12' id='team16'><span>16</span></div>
-                <div class='team col-xs-12' id='team17'><span>17</span></div>
-                <div class='team col-xs-12' id='team18'><span>18</span></div>
-                <div class='team col-xs-12' id='team19'><span>19</span></div>
-                <div class='team col-xs-12' id='team20'><span>20</span></div>
+        <div class='col-12 col-sm-6'><div class='row'>
+            <div class='col-12 col-lg-6'><div class='row'>
+                <div class='team col-12' id='team01'><span>01</span></div>
+                <div class='team col-12' id='team02'><span>02</span></div>
+                <div class='team col-12' id='team03'><span>03</span></div>
+                <div class='team col-12' id='team04'><span>04</span></div>
+                <div class='team col-12' id='team05'><span>05</span></div>
+                <div class='team col-12' id='team06'><span>06</span></div>
+                <div class='team col-12' id='team07'><span>07</span></div>
+                <div class='team col-12' id='team08'><span>08</span></div>
+                <div class='team col-12' id='team09'><span>09</span></div>
+                <div class='team col-12' id='team10'><span>10</span></div>
+            </div></div><div class='col-12 col-lg-6'><div class='row'>
+                <div class='team col-12' id='team11'><span>11</span></div>
+                <div class='team col-12' id='team12'><span>12</span></div>
+                <div class='team col-12' id='team13'><span>13</span></div>
+                <div class='team col-12' id='team14'><span>14</span></div>
+                <div class='team col-12' id='team15'><span>15</span></div>
+                <div class='team col-12' id='team16'><span>16</span></div>
+                <div class='team col-12' id='team17'><span>17</span></div>
+                <div class='team col-12' id='team18'><span>18</span></div>
+                <div class='team col-12' id='team19'><span>19</span></div>
+                <div class='team col-12' id='team20'><span>20</span></div>
             </div></div>
-        </div></div><div class='col-xs-12 col-sm-6'><div class='row'>
-            <div class='col-xs-12 col-lg-6'><div class='row'>
-                <div class='team col-xs-12' id='team21'><span>21</span></div>
-                <div class='team col-xs-12' id='team22'><span>22</span></div>
-                <div class='team col-xs-12' id='team23'><span>23</span></div>
-                <div class='team col-xs-12' id='team24'><span>24</span></div>
-                <div class='team col-xs-12' id='team25'><span>25</span></div>
-                <div class='team col-xs-12' id='team26'><span>26</span></div>
-                <div class='team col-xs-12' id='team27'><span>27</span></div>
-                <div class='team col-xs-12' id='team28'><span>28</span></div>
-                <div class='team col-xs-12' id='team29'><span>29</span></div>
-                <div class='team col-xs-12' id='team30'><span>30</span></div>
-            </div></div><div class='col-xs-12 col-lg-6'><div class='row'>
-                <div class='team col-xs-12' id='team31'><span>31</span></div>
-                <div class='team col-xs-12' id='team32'><span>32</span></div>
-                <div class='team col-xs-12' id='team33'><span>33</span></div>
-                <div class='team col-xs-12' id='team34'><span>34</span></div>
-                <div class='team col-xs-12' id='team35'><span>35</span></div>
-                <div class='team col-xs-12' id='team36'><span>36</span></div>
-                <div class='team col-xs-12' id='team37'><span>37</span></div>
-                <div class='team col-xs-12' id='team38'><span>38</span></div>
-                <div class='team col-xs-12' id='team39'><span>39</span></div>
-                <div class='team col-xs-12' id='team40'><span>40</span></div>
+        </div></div><div class='col-12 col-sm-6'><div class='row'>
+            <div class='col-12 col-lg-6'><div class='row'>
+                <div class='team col-12' id='team21'><span>21</span></div>
+                <div class='team col-12' id='team22'><span>22</span></div>
+                <div class='team col-12' id='team23'><span>23</span></div>
+                <div class='team col-12' id='team24'><span>24</span></div>
+                <div class='team col-12' id='team25'><span>25</span></div>
+                <div class='team col-12' id='team26'><span>26</span></div>
+                <div class='team col-12' id='team27'><span>27</span></div>
+                <div class='team col-12' id='team28'><span>28</span></div>
+                <div class='team col-12' id='team29'><span>29</span></div>
+                <div class='team col-12' id='team30'><span>30</span></div>
+            </div></div><div class='col-12 col-lg-6'><div class='row'>
+                <div class='team col-12' id='team31'><span>31</span></div>
+                <div class='team col-12' id='team32'><span>32</span></div>
+                <div class='team col-12' id='team33'><span>33</span></div>
+                <div class='team col-12' id='team34'><span>34</span></div>
+                <div class='team col-12' id='team35'><span>35</span></div>
+                <div class='team col-12' id='team36'><span>36</span></div>
+                <div class='team col-12' id='team37'><span>37</span></div>
+                <div class='team col-12' id='team38'><span>38</span></div>
+                <div class='team col-12' id='team39'><span>39</span></div>
+                <div class='team col-12' id='team40'><span>40</span></div>
             </div></div>
         </div></div>
     </div>
     <div class='row' id='add'>
-        <div class='col-xs-6'>
+        <div class='col-6'>
             <form action='#' id="form-pool"><div class='input-group'>
                 <input type="text" class="form-control" placeholder='Card id' />
                 <span class="input-group-btn"><button class="btn btn-success" type="submit" aria-label='Add'><i class='fa fa-plus'></i></button></span>
             </div></form>
         </div>
-        <div class='col-xs-6' style='text-align: right'>
+        <div class='col-6' style='text-align: right'>
             <button type='button' id='btn-collapse' class='btn btn-default'><i class='fa fa-chevron-down'></i></button>
             <button type='button' id='btn-expand' class='btn btn-default'><i class='fa fa-chevron-up'></i></button>
         </div>
     </div>
     <div class='row' id='pool'>
-        <div class='col-xs-12'><button type="button" id='btn-add' class='btn btn-success'><i class="fa fa-plus fa-fw fa-2x"></i></button></div>
+        <div class='col-12'><button type="button" id='btn-add' class='btn btn-success'><i class="fa fa-plus fa-fw fa-2x"></i></button></div>
     </div>
 </div>
 <form action='#' class="form-mem" style="display:none"><div class='input-group'>
