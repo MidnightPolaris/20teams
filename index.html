@@ -240,7 +240,7 @@ $(function(){
 	});
 	
 	// Pass
-	$('.team > span').on('click', function(){
+	$('.team-num').on('click', function(){
 		var team = $(this).parent();
 		team.toggleClass('pass');
 		repo.key(['pass',team.index('.team')])(team.hasClass('pass'));
