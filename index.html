@@ -87,14 +87,16 @@ $(function(){
 		var temp = {};
 		$('.mem').each(function(){
 			var id = $(this).data('id');
-			if(temp[id] !== undefined && !temp[id].parents('.team').is($(this).parents('.team'))){
-				temp[id].addClass('warn');
-				$(this).addClass('warn');
-			}
-			if(id !== '000'){
-				temp[id] = $(this);
-			}
-		})
+			if(id === '000')
+				return true;
+			if(temp[id] === undefined)
+				temp[id] = $();
+			temp[id].add(this);
+		});
+		for(var id in temp){
+			if(temp[id].parents('.team').length > 1)
+				temp[id].parents('.team').addBack().addClass('warn');
+		}
 	}
 	function update(mem, id){
 		repo.key(['teams', mem.parents('.team').index('.team'), mem.index()])(id);
@@ -307,10 +309,15 @@ body{ overflow: hidden; }
 	border: 1px solid silver;
 	border-radius: 5px;
 }
+.team.warn > *{
+	color:        hsl(0, 100%, 35%);
+	border-color: hsl(0, 100%, 50%);
+	background:   hsl(0, 100%, 75%);
+}
 .team.pass > *{
-	color: #2C852C;
-	border-color: #3FBF3F;
-	background: #9FDF9F;
+	color:        hsl(120, 50%, 35%);
+	border-color: hsl(120, 50%, 50%);
+	background:   hsl(120, 50%, 75%);
 }
 
 .mem{
