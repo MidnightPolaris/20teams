@@ -90,10 +90,13 @@ $(function(){
 				temp[id].parents('.team').addBack().addClass('warn');
 		}
 	}
-	function update(mem, id){
-		repo.key(['teams', mem.parents('.team').index('.team'), mem.index()])(id);
+	function update(card, id){
+		if(card.is('.mem'))
+			repo.key(['teams', card.parents('.team').index('.team'), card.index()])(id);
+		else
+			repo.key(['pool'], [])().splice(card.index('.pool'), 1, id);
 		repo.flush();
-		mem.data('id',id).empty().append(image(id));
+		card.data('id', id).empty().append(image(id));
 	}
 	function pool(id){
 		$('<div>')
@@ -102,6 +105,11 @@ $(function(){
 			.data('id',id)
 			.attr('draggable', true)
 			.insertBefore('#btn-add');
+	}
+	function unpool(index){
+		repo.key(['pool'], [])().splice(index, 1);
+		repo.flush();
+		$('.pool').eq(index).remove();
 	}
 
 	// Teams
@@ -139,6 +147,7 @@ $(function(){
 	});
 	$('#teams').on('inserted.bs.popover', '.mem', function(){
 		var $this = $(this);
+		$('.popover .btn-block').hide();
 		$('.popover input')
 			.val($(this).data('id'))
 			.focus().select();
@@ -148,14 +157,8 @@ $(function(){
 			check();
 			return !!e.preventDefault();
 		});
-		$('.popover').on('mousedown', function(e){
-			e.stopPropagation();
-		});
 	});
-	$('body').on('mousedown', function(){
-		$('.popover').popover('hide');
-	});
-	
+
 	// Pool
 	$('#form-pool').on('submit', function(e){
 		var inp = $(this).find('input');
@@ -163,16 +166,48 @@ $(function(){
 		pool(val);
 		repo.key('pool', [])().push(val);
 		repo.flush();
-		
+
 		inp.val('');
 		return !!e.preventDefault();
 	});
 	$.each(repo.key(['pool'], [])(), function(i,e){
 		pool(e);
 	});
-	
+	$('#pool').popover({
+		selector: '.pool',
+		placement: 'top',
+		container: 'body',
+		title: '',
+		content: $('#form-mem').html(),
+		html: true,
+	});
+	$('#pool').on('inserted.bs.popover', '.pool', function(){
+		var $this = $(this);
+		$('.popover .btn-block').on('click', function(){
+			unpool($this.index('.pool'));
+			$('.popover').popover('hide');
+		});
+		$('.popover input')
+			.val($(this).data('id'))
+			.focus().select();
+		$('.popover form').on('submit', function(e){
+			update($this, $(this).find('input').val());
+			$('.popover').popover('hide');
+			return !!e.preventDefault();
+		});
+	});
+
 	$('#btn-add').on('click', function(){ $('#add input').focus(); });
-	
+
+	// Popovers
+	$('body').on('inserted.bs.popover',function(){
+		$('.popover').on('mousedown', function(e){
+			e.stopPropagation();
+		});
+	}).on('mousedown', function(){
+		$('.popover').popover('hide');
+	});
+
 	// Drag & drop
 	$('#pool').on('dragstart', '.pool', function(e){
 		e.originalEvent.dataTransfer.setData('text/plain', $(this).data('id'));
@@ -194,7 +229,7 @@ $(function(){
 		}
 		check();
 	});
-	
+
 	$('body').on('dragover', '.mem, #teams, #pool', function(e){
 		$(this).addClass('drag');
 	}).on('dragover', '.mem, #teams, #pool', function(e){
@@ -211,7 +246,7 @@ $(function(){
 		repo.key('pool', [])().push(id);
 		repo.flush();
 	});
-	
+
 	// Collapse
 	var aniSp = 500;
 	$('#btn-collapse').on('click', function(){
@@ -230,7 +265,7 @@ $(function(){
 		$('#btn-expand').delay(aniSp).animate({opacity: 0}, aniSp);
 		$('#btn-collapse').delay(aniSp).animate({opacity: 1}, aniSp);
 	});
-	
+
 	// Pass
 	$('.team-num').on('click', function(){
 		var team = $(this).parent();
@@ -242,7 +277,7 @@ $(function(){
 	for(var k in pass){
 		if(pass[k]) $('.team').eq(k).addClass('pass');
 	}
-	
+
 	check();
 });
 </script>
@@ -374,10 +409,13 @@ body{ overflow: hidden; }
 	</div>
 </div>
 <template id="form-mem">
-	<form action='#' class="form-mem"><div class='input-group'>
-		<input type='text' class='form-control' placeholder='Card id' />
-		<span class='input-group-btn'><button class='btn btn-primary' type='submit' aria-label='OK'><i class='fa fa-check'></i></button></span>
-	</div></form>
+	<form action='#' class="form-mem">
+		<div class='input-group'>
+			<input type='text' class='form-control' placeholder='Card id' />
+			<span class='input-group-btn'><button class='btn btn-primary' type='submit' aria-label='OK'><i class='fa fa-check'></i></button></span>
+		</div>
+		<button type="button" class="btn btn-danger btn-block mt-1"><i class="fa fa-trash-o"></i></button>
+	</form>
 </template>
 </body>
 </html>
