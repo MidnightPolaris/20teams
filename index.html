@@ -112,6 +112,7 @@ $(function(){
 
 	// Teams
 	function pad(str, len, pad){
+		str = str.toString();
 		while(str.length < len)
 			str = pad + str;
 		return str;
@@ -125,7 +126,7 @@ $(function(){
 	for(var i = 0; i < ROWS; i++)
 		row.clone().appendTo('#teams .row')
 	$('.team').each(function(i){
-		var num = pad(i,2,'0');
+		var num = pad(i+1,2,'0');
 		var div = $(this).attr('id', 'team' + num)
 			.find('.team-num').text(num)
 			.end().find('.team-mem');
