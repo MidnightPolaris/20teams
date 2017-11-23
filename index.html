@@ -123,7 +123,7 @@ $(function(){
         placement: 'bottom',
         container: 'body',
         title: '',
-        content: $('.form-mem').eq(-1).clone().show().get(0).outerHTML,
+        content: $('#form-mem').html(),
         html: true,
     });
     $('#teams').on('inserted.bs.popover', '.mem', function(){
@@ -399,9 +399,11 @@ body{ overflow: hidden; }
         <div class='col-12'><button type="button" id='btn-add' class='btn btn-success'><i class="fa fa-plus fa-fw fa-2x"></i></button></div>
     </div>
 </div>
-<form action='#' class="form-mem" style="display:none"><div class='input-group'>
-    <input type='text' class='form-control' placeholder='Card id' />
-    <span class='input-group-btn'><button class='btn btn-primary' type='submit' aria-label='OK'><i class='fa fa-check'></i></button></span>
-</div></form>
+<template id="form-mem">
+	<form action='#' class="form-mem" style="display:none"><div class='input-group'>
+		<input type='text' class='form-control' placeholder='Card id' />
+		<span class='input-group-btn'><button class='btn btn-primary' type='submit' aria-label='OK'><i class='fa fa-check'></i></button></span>
+	</div></form>
+</template>
 </body>
 </html>
