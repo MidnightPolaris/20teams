@@ -9,26 +9,26 @@
 
 <script type="text/javascript">
 function Repo(ns){
-    this.ns = ns;
-    localStorage[ns] = localStorage[ns] || '{}';
-    this.val = JSON.parse(localStorage[ns]);
+	this.ns = ns;
+	localStorage[ns] = localStorage[ns] || '{}';
+	this.val = JSON.parse(localStorage[ns]);
 }
 Repo.prototype.key = function(key, def){
-    key = $.makeArray(key);
-    var temp = this.val, last = key.pop();
-    $.each(key, function(i,e){
-        if(temp[e] === undefined)
-            temp[e] = {};
-        temp = temp[e];
-    });
-    if(temp[last] === undefined){
-        temp[last] = def;
-    }
-    return function(v){
-        return v === undefined
-            ? temp[last]
-            : temp[last] = v;
-    }
+	key = $.makeArray(key);
+	var temp = this.val, last = key.pop();
+	$.each(key, function(i,e){
+		if(temp[e] === undefined)
+			temp[e] = {};
+		temp = temp[e];
+	});
+	if(temp[last] === undefined){
+		temp[last] = def;
+	}
+	return function(v){
+		return v === undefined
+			? temp[last]
+			: temp[last] = v;
+	}
 }
 Repo.prototype.flush = function(){ localStorage[this.ns] = JSON.stringify(this.val); }
 Repo.prototype.clear = function(){
@@ -39,9 +39,9 @@ Repo.prototype.clear = function(){
 window.df = {};
 window.repo = new Repo('20teams');
 function image(id){
-    var img = $('<div>').addClass('spinner').append(
-        $('<i>').addClass('fa fa-circle-o-notch fa-fw fa-3x fa-spin')
-    );
+	var img = $('<div>').addClass('spinner').append(
+		$('<i>').addClass('fa fa-circle-o-notch fa-fw fa-3x fa-spin')
+	);
 	if(df[id] === undefined){
 		df[id] = new Promise((resolve, reject) => {
 			resolve(repo.key(['img', id])() !== undefined
@@ -70,169 +70,169 @@ function image(id){
 	}).catch(function(){
 		$('<div>').addClass('error').append($('<i>').addClass('fa fa-times fa-fw fa-3x')).replaceAll(img)
 	});
-    return img;
+	return img;
 }
 
 $(function(){
-    Array.prototype.unique = function(){
-        this.sort();
-        var dup = [];
-        for(var i = this.length-1; i; i--){
-            if(this[i] == this[i+1]) dup.push(this.splice(i, 1)[0]);
-        }
-        return [this, dup];
-    };
-    function check(){
-        $('.warn').removeClass('warn');
-        var temp = {};
-        $('.mem').each(function(){
-            var id = $(this).data('id');
-            if(temp[id] !== undefined && !temp[id].parents('.team').is($(this).parents('.team'))){
-                temp[id].addClass('warn');
-                $(this).addClass('warn');
-            }
-            if(id !== '000'){
-                temp[id] = $(this);
-            }
-        })
-    }
-    function update(mem, id){
-        repo.key(['teams', mem.parents('.team').index('.team'), mem.index()])(id);
-        repo.flush();
-        mem.data('id',id).empty().append(image(id));
-    }
-    function pool(id){
-        $('<div>')
-            .addClass('pool')
-            .append(image(id))
-            .data('id',id)
-            .attr('draggable', true)
-            .insertBefore('#btn-add');
-    }
+	Array.prototype.unique = function(){
+		this.sort();
+		var dup = [];
+		for(var i = this.length-1; i; i--){
+			if(this[i] == this[i+1]) dup.push(this.splice(i, 1)[0]);
+		}
+		return [this, dup];
+	};
+	function check(){
+		$('.warn').removeClass('warn');
+		var temp = {};
+		$('.mem').each(function(){
+			var id = $(this).data('id');
+			if(temp[id] !== undefined && !temp[id].parents('.team').is($(this).parents('.team'))){
+				temp[id].addClass('warn');
+				$(this).addClass('warn');
+			}
+			if(id !== '000'){
+				temp[id] = $(this);
+			}
+		})
+	}
+	function update(mem, id){
+		repo.key(['teams', mem.parents('.team').index('.team'), mem.index()])(id);
+		repo.flush();
+		mem.data('id',id).empty().append(image(id));
+	}
+	function pool(id){
+		$('<div>')
+			.addClass('pool')
+			.append(image(id))
+			.data('id',id)
+			.attr('draggable', true)
+			.insertBefore('#btn-add');
+	}
 
-    // Teams
-    $('.team').each(function(i){
-        var div = $('<div>').appendTo(this);
-        for(var j = 0; j < 6; j++){
-            var id = repo.key(['teams', i, j], '000')();
-            $('<div>').addClass('mem').data('id', id).append(image(id)).appendTo(div);
-        }
-    });
-    $('#teams').popover({
-        selector: '.mem',
-        placement: 'bottom',
-        container: 'body',
-        title: '',
-        content: $('#form-mem').html(),
-        html: true,
-    });
-    $('#teams').on('inserted.bs.popover', '.mem', function(){
-        var $this = $(this);
-        $('.popover input')
-            .val($(this).data('id'))
-            .focus().select()
-        $('.popover form').on('submit', function(e){
+	// Teams
+	$('.team').each(function(i){
+		var div = $('<div>').appendTo(this);
+		for(var j = 0; j < 6; j++){
+			var id = repo.key(['teams', i, j], '000')();
+			$('<div>').addClass('mem').data('id', id).append(image(id)).appendTo(div);
+		}
+	});
+	$('#teams').popover({
+		selector: '.mem',
+		placement: 'bottom',
+		container: 'body',
+		title: '',
+		content: $('#form-mem').html(),
+		html: true,
+	});
+	$('#teams').on('inserted.bs.popover', '.mem', function(){
+		var $this = $(this);
+		$('.popover input')
+			.val($(this).data('id'))
+			.focus().select()
+		$('.popover form').on('submit', function(e){
 			update($this, $(this).find('input').val());
 			$('.popover').popover('hide');
 			check();
 			return !!e.preventDefault();
 		})
-        $('.popover').on('mousedown', function(e){
-            e.stopPropagation();
-        });
-    });
-    $('body').on('mousedown', function(){
+		$('.popover').on('mousedown', function(e){
+			e.stopPropagation();
+		});
+	});
+	$('body').on('mousedown', function(){
 		$('.popover').popover('hide');
-    });
-    
-    // Pool
-    $('#form-pool').on('submit', function(e){
-        var inp = $(this).find('input');
-        var val = inp.val();
-        pool(val);
-        repo.key('pool', [])().push(val);
-        repo.flush();
-        
-        inp.val('');
-        return !!e.preventDefault();
-    });
-    $.each(repo.key(['pool'], [])(), function(i,e){
-        pool(e);
-    });
-    
-    $('#btn-add').on('click', function(){ $('#add input').focus(); });
-    
-    // Drag & drop
-    $('#pool').on('dragstart', '.pool', function(e){
-        e.originalEvent.dataTransfer.setData('text/plain', $(this).data('id'));
-        e.originalEvent.dataTransfer.effectAllowed = 'copyMove';
-    }).on('dragend', '.pool', function(e){
-        if(e.originalEvent.dataTransfer.dropEffect == 'move'){
-            repo.key('pool',[])().splice($(this).index(), 1);
-            repo.flush();
-            $(this).remove();
-        }
-        check();
-    });
-    $('#teams').on('dragstart', '.mem', function(e){
-        e.originalEvent.dataTransfer.setData('text/plain', $(this).data('id'));
-        e.originalEvent.dataTransfer.effectAllowed = 'copyMove';
-    }).on('dragend', '.mem', function(e){
-        if(e.originalEvent.dataTransfer.dropEffect == 'move'){
-            update($(this), '000');
-        }
-        check();
-    });
-    
-    $('body').on('dragover', '.mem, #teams, #pool', function(e){
-        $(this).addClass('drag');
-    }).on('dragover', '.mem, #teams, #pool', function(e){
-        e.originalEvent.dataTransfer.dropEffect = e.ctrlKey ? 'copy' : 'move';
-        return !!e.preventDefault();
-    }).on('dragleave', '.mem, #teams, #pool', function(e){
-        $(this).removeClass('drag');
-    }).on('drop', '.mem', function(e){
-        update($(this).removeClass('drag'), e.originalEvent.dataTransfer.getData('text/plain'));
-    }).on('drop', '#pool', function(e){
-        $(this).removeClass('drag');
-        var id = e.originalEvent.dataTransfer.getData('text/plain');
-        pool(id);
-        repo.key('pool', [])().push(id);
-        repo.flush();
-    });
-    
-    // Collapse
-    var aniSp = 500;
-    $('#btn-collapse').on('click', function(){
-        $('#teams').css({minHeight: function(){
-            return ($(this).outerHeight()/$('body').height()*100) + '%'
-        }}).animate({minHeight: '100%'}, aniSp);
-        $('#btn-expand').delay(aniSp).animate({opacity: 1}, aniSp);
-        $('#btn-collapse').delay(aniSp).animate({opacity: 0}, aniSp);
-    });
-    $('#btn-expand').on('click', function(){
-        var h = $('body').height();
-        $('#teams').nextAll().each(function(){
-            h -= $(this).outerHeight();
-        });
-        $('#teams').animate({minHeight: h/$('body').height()*100 + '%'}, aniSp).queue(function(n){ $(this).css({minHeight: 0}); n(); });
-        $('#btn-expand').delay(aniSp).animate({opacity: 0}, aniSp);
-        $('#btn-collapse').delay(aniSp).animate({opacity: 1}, aniSp);
-    });
-    
-    // Pass
-    $('.team > span').on('click', function(){
-        var team = $(this).parent();
-        team.toggleClass('pass');
-        repo.key(['pass',team.index('.team')])(team.hasClass('pass'));
-        repo.flush();
-    });
-    var pass = repo.key(['pass'], {})();
-    for(var k in pass){
-        if(pass[k]) $('.team').eq(k).addClass('pass');
-    }
-    
-    check();
+	});
+	
+	// Pool
+	$('#form-pool').on('submit', function(e){
+		var inp = $(this).find('input');
+		var val = inp.val();
+		pool(val);
+		repo.key('pool', [])().push(val);
+		repo.flush();
+		
+		inp.val('');
+		return !!e.preventDefault();
+	});
+	$.each(repo.key(['pool'], [])(), function(i,e){
+		pool(e);
+	});
+	
+	$('#btn-add').on('click', function(){ $('#add input').focus(); });
+	
+	// Drag & drop
+	$('#pool').on('dragstart', '.pool', function(e){
+		e.originalEvent.dataTransfer.setData('text/plain', $(this).data('id'));
+		e.originalEvent.dataTransfer.effectAllowed = 'copyMove';
+	}).on('dragend', '.pool', function(e){
+		if(e.originalEvent.dataTransfer.dropEffect == 'move'){
+			repo.key('pool',[])().splice($(this).index(), 1);
+			repo.flush();
+			$(this).remove();
+		}
+		check();
+	});
+	$('#teams').on('dragstart', '.mem', function(e){
+		e.originalEvent.dataTransfer.setData('text/plain', $(this).data('id'));
+		e.originalEvent.dataTransfer.effectAllowed = 'copyMove';
+	}).on('dragend', '.mem', function(e){
+		if(e.originalEvent.dataTransfer.dropEffect == 'move'){
+			update($(this), '000');
+		}
+		check();
+	});
+	
+	$('body').on('dragover', '.mem, #teams, #pool', function(e){
+		$(this).addClass('drag');
+	}).on('dragover', '.mem, #teams, #pool', function(e){
+		e.originalEvent.dataTransfer.dropEffect = e.ctrlKey ? 'copy' : 'move';
+		return !!e.preventDefault();
+	}).on('dragleave', '.mem, #teams, #pool', function(e){
+		$(this).removeClass('drag');
+	}).on('drop', '.mem', function(e){
+		update($(this).removeClass('drag'), e.originalEvent.dataTransfer.getData('text/plain'));
+	}).on('drop', '#pool', function(e){
+		$(this).removeClass('drag');
+		var id = e.originalEvent.dataTransfer.getData('text/plain');
+		pool(id);
+		repo.key('pool', [])().push(id);
+		repo.flush();
+	});
+	
+	// Collapse
+	var aniSp = 500;
+	$('#btn-collapse').on('click', function(){
+		$('#teams').css({minHeight: function(){
+			return ($(this).outerHeight()/$('body').height()*100) + '%'
+		}}).animate({minHeight: '100%'}, aniSp);
+		$('#btn-expand').delay(aniSp).animate({opacity: 1}, aniSp);
+		$('#btn-collapse').delay(aniSp).animate({opacity: 0}, aniSp);
+	});
+	$('#btn-expand').on('click', function(){
+		var h = $('body').height();
+		$('#teams').nextAll().each(function(){
+			h -= $(this).outerHeight();
+		});
+		$('#teams').animate({minHeight: h/$('body').height()*100 + '%'}, aniSp).queue(function(n){ $(this).css({minHeight: 0}); n(); });
+		$('#btn-expand').delay(aniSp).animate({opacity: 0}, aniSp);
+		$('#btn-collapse').delay(aniSp).animate({opacity: 1}, aniSp);
+	});
+	
+	// Pass
+	$('.team > span').on('click', function(){
+		var team = $(this).parent();
+		team.toggleClass('pass');
+		repo.key(['pass',team.index('.team')])(team.hasClass('pass'));
+		repo.flush();
+	});
+	var pass = repo.key(['pass'], {})();
+	for(var k in pass){
+		if(pass[k]) $('.team').eq(k).addClass('pass');
+	}
+	
+	check();
 });
 </script>
 <style>
@@ -240,164 +240,164 @@ html, body, .wrapper { height: 100%; }
 body{ overflow: hidden; }
 
 .wrapper{
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
 #teams{
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
+	flex: 1;
+	overflow-y: auto;
+	min-height: 0;
 }
 #add, #pool{ flex: none; }
 .spinner, .error{
-    width: 100%;
-    height: 0;
-    padding: 50% 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	width: 100%;
+	height: 0;
+	padding: 50% 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 .error{
-    margin: -1px;
-    border: 1px solid red;
-    border-radius: 5px;
-    color: red;
-    background: pink;
+	margin: -1px;
+	border: 1px solid red;
+	border-radius: 5px;
+	color: red;
+	background: pink;
 }
 
 .team {
-    padding: 0;
-    position: relative;
+	padding: 0;
+	position: relative;
 }
 .team > span{
-    display: block;
-    position: absolute;
-    left: 3px;
-    top: 3px;
-    width: 25px;
-    height: 15px;
-    border-radius: 10px;
-    border: 1px solid silver;
-    background: white;
-    color: #666;
-    text-align: center;
-    line-height: 15px;
-    cursor: pointer;
+	display: block;
+	position: absolute;
+	left: 3px;
+	top: 3px;
+	width: 25px;
+	height: 15px;
+	border-radius: 10px;
+	border: 1px solid silver;
+	background: white;
+	color: #666;
+	text-align: center;
+	line-height: 15px;
+	cursor: pointer;
 }
 .team > div{
-    display: flex;
-    margin: 5px;
-    border: 1px solid silver;
-    border-radius: 5px;
+	display: flex;
+	margin: 5px;
+	border: 1px solid silver;
+	border-radius: 5px;
 }
 .team.pass > div, .team.pass > span{
-    color: #2C852C;
-    border-color: #3FBF3F;
-    background: #9FDF9F;
+	color: #2C852C;
+	border-color: #3FBF3F;
+	background: #9FDF9F;
 }
 
 .mem{
-    flex: 1;
-    margin: 2px;
-    border: 3px solid transparent;
-    border-radius: 3px;
-    padding: 2px;
+	flex: 1;
+	margin: 2px;
+	border: 3px solid transparent;
+	border-radius: 3px;
+	padding: 2px;
 }
 .mem img{ width: 100%; height: auto; }
 .mem.drag{ border-color: #0CF; }
 .mem.warn{ border-color: red; }
 
 #add{
-    border-top: 1px solid silver;
-    border-bottom: 1px solid silver;
-    padding: 10px 0;
+	border-top: 1px solid silver;
+	border-bottom: 1px solid silver;
+	padding: 10px 0;
 }
 
 .pool, #btn-add{
-    position: relative;
-    width: 70px;
-    height: 70px;
-    float: left;
-    margin: 7px;
+	position: relative;
+	width: 70px;
+	height: 70px;
+	float: left;
+	margin: 7px;
 }
 .pool img{ width: 100%; height: auto; }
 
 #btn-expand{
-    position: absolute;
-    bottom: 150%;
-    right: 15px;
-    opacity: 0;
+	position: absolute;
+	bottom: 150%;
+	right: 15px;
+	opacity: 0;
 }
 </style>
 </head>
 <body>
 <div class='container-fluid wrapper'>
-    <div class='row' id='teams'>
-        <div class='col-12 col-sm-6'><div class='row'>
-            <div class='col-12 col-lg-6'><div class='row'>
-                <div class='team col-12' id='team01'><span>01</span></div>
-                <div class='team col-12' id='team02'><span>02</span></div>
-                <div class='team col-12' id='team03'><span>03</span></div>
-                <div class='team col-12' id='team04'><span>04</span></div>
-                <div class='team col-12' id='team05'><span>05</span></div>
-                <div class='team col-12' id='team06'><span>06</span></div>
-                <div class='team col-12' id='team07'><span>07</span></div>
-                <div class='team col-12' id='team08'><span>08</span></div>
-                <div class='team col-12' id='team09'><span>09</span></div>
-                <div class='team col-12' id='team10'><span>10</span></div>
-            </div></div><div class='col-12 col-lg-6'><div class='row'>
-                <div class='team col-12' id='team11'><span>11</span></div>
-                <div class='team col-12' id='team12'><span>12</span></div>
-                <div class='team col-12' id='team13'><span>13</span></div>
-                <div class='team col-12' id='team14'><span>14</span></div>
-                <div class='team col-12' id='team15'><span>15</span></div>
-                <div class='team col-12' id='team16'><span>16</span></div>
-                <div class='team col-12' id='team17'><span>17</span></div>
-                <div class='team col-12' id='team18'><span>18</span></div>
-                <div class='team col-12' id='team19'><span>19</span></div>
-                <div class='team col-12' id='team20'><span>20</span></div>
-            </div></div>
-        </div></div><div class='col-12 col-sm-6'><div class='row'>
-            <div class='col-12 col-lg-6'><div class='row'>
-                <div class='team col-12' id='team21'><span>21</span></div>
-                <div class='team col-12' id='team22'><span>22</span></div>
-                <div class='team col-12' id='team23'><span>23</span></div>
-                <div class='team col-12' id='team24'><span>24</span></div>
-                <div class='team col-12' id='team25'><span>25</span></div>
-                <div class='team col-12' id='team26'><span>26</span></div>
-                <div class='team col-12' id='team27'><span>27</span></div>
-                <div class='team col-12' id='team28'><span>28</span></div>
-                <div class='team col-12' id='team29'><span>29</span></div>
-                <div class='team col-12' id='team30'><span>30</span></div>
-            </div></div><div class='col-12 col-lg-6'><div class='row'>
-                <div class='team col-12' id='team31'><span>31</span></div>
-                <div class='team col-12' id='team32'><span>32</span></div>
-                <div class='team col-12' id='team33'><span>33</span></div>
-                <div class='team col-12' id='team34'><span>34</span></div>
-                <div class='team col-12' id='team35'><span>35</span></div>
-                <div class='team col-12' id='team36'><span>36</span></div>
-                <div class='team col-12' id='team37'><span>37</span></div>
-                <div class='team col-12' id='team38'><span>38</span></div>
-                <div class='team col-12' id='team39'><span>39</span></div>
-                <div class='team col-12' id='team40'><span>40</span></div>
-            </div></div>
-        </div></div>
-    </div>
-    <div class='row' id='add'>
-        <div class='col-6'>
-            <form action='#' id="form-pool"><div class='input-group'>
-                <input type="text" class="form-control" placeholder='Card id' />
-                <span class="input-group-btn"><button class="btn btn-success" type="submit" aria-label='Add'><i class='fa fa-plus'></i></button></span>
-            </div></form>
-        </div>
-        <div class='col-6' style='text-align: right'>
-            <button type='button' id='btn-collapse' class='btn btn-default'><i class='fa fa-chevron-down'></i></button>
-            <button type='button' id='btn-expand' class='btn btn-default'><i class='fa fa-chevron-up'></i></button>
-        </div>
-    </div>
-    <div class='row' id='pool'>
-        <div class='col-12'><button type="button" id='btn-add' class='btn btn-success'><i class="fa fa-plus fa-fw fa-2x"></i></button></div>
-    </div>
+	<div class='row' id='teams'>
+		<div class='col-12 col-sm-6'><div class='row'>
+			<div class='col-12 col-lg-6'><div class='row'>
+				<div class='team col-12' id='team01'><span>01</span></div>
+				<div class='team col-12' id='team02'><span>02</span></div>
+				<div class='team col-12' id='team03'><span>03</span></div>
+				<div class='team col-12' id='team04'><span>04</span></div>
+				<div class='team col-12' id='team05'><span>05</span></div>
+				<div class='team col-12' id='team06'><span>06</span></div>
+				<div class='team col-12' id='team07'><span>07</span></div>
+				<div class='team col-12' id='team08'><span>08</span></div>
+				<div class='team col-12' id='team09'><span>09</span></div>
+				<div class='team col-12' id='team10'><span>10</span></div>
+			</div></div><div class='col-12 col-lg-6'><div class='row'>
+				<div class='team col-12' id='team11'><span>11</span></div>
+				<div class='team col-12' id='team12'><span>12</span></div>
+				<div class='team col-12' id='team13'><span>13</span></div>
+				<div class='team col-12' id='team14'><span>14</span></div>
+				<div class='team col-12' id='team15'><span>15</span></div>
+				<div class='team col-12' id='team16'><span>16</span></div>
+				<div class='team col-12' id='team17'><span>17</span></div>
+				<div class='team col-12' id='team18'><span>18</span></div>
+				<div class='team col-12' id='team19'><span>19</span></div>
+				<div class='team col-12' id='team20'><span>20</span></div>
+			</div></div>
+		</div></div><div class='col-12 col-sm-6'><div class='row'>
+			<div class='col-12 col-lg-6'><div class='row'>
+				<div class='team col-12' id='team21'><span>21</span></div>
+				<div class='team col-12' id='team22'><span>22</span></div>
+				<div class='team col-12' id='team23'><span>23</span></div>
+				<div class='team col-12' id='team24'><span>24</span></div>
+				<div class='team col-12' id='team25'><span>25</span></div>
+				<div class='team col-12' id='team26'><span>26</span></div>
+				<div class='team col-12' id='team27'><span>27</span></div>
+				<div class='team col-12' id='team28'><span>28</span></div>
+				<div class='team col-12' id='team29'><span>29</span></div>
+				<div class='team col-12' id='team30'><span>30</span></div>
+			</div></div><div class='col-12 col-lg-6'><div class='row'>
+				<div class='team col-12' id='team31'><span>31</span></div>
+				<div class='team col-12' id='team32'><span>32</span></div>
+				<div class='team col-12' id='team33'><span>33</span></div>
+				<div class='team col-12' id='team34'><span>34</span></div>
+				<div class='team col-12' id='team35'><span>35</span></div>
+				<div class='team col-12' id='team36'><span>36</span></div>
+				<div class='team col-12' id='team37'><span>37</span></div>
+				<div class='team col-12' id='team38'><span>38</span></div>
+				<div class='team col-12' id='team39'><span>39</span></div>
+				<div class='team col-12' id='team40'><span>40</span></div>
+			</div></div>
+		</div></div>
+	</div>
+	<div class='row' id='add'>
+		<div class='col-6'>
+			<form action='#' id="form-pool"><div class='input-group'>
+				<input type="text" class="form-control" placeholder='Card id' />
+				<span class="input-group-btn"><button class="btn btn-success" type="submit" aria-label='Add'><i class='fa fa-plus'></i></button></span>
+			</div></form>
+		</div>
+		<div class='col-6' style='text-align: right'>
+			<button type='button' id='btn-collapse' class='btn btn-default'><i class='fa fa-chevron-down'></i></button>
+			<button type='button' id='btn-expand' class='btn btn-default'><i class='fa fa-chevron-up'></i></button>
+		</div>
+	</div>
+	<div class='row' id='pool'>
+		<div class='col-12'><button type="button" id='btn-add' class='btn btn-success'><i class="fa fa-plus fa-fw fa-2x"></i></button></div>
+	</div>
 </div>
 <template id="form-mem">
 	<form action='#' class="form-mem" style="display:none"><div class='input-group'>
