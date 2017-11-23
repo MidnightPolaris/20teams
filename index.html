@@ -111,8 +111,24 @@ $(function(){
 	}
 
 	// Teams
+	function pad(str, len, pad){
+		while(str.length < len)
+			str = pad + str;
+		return str;
+	}
+	var COLS = 4, ROWS = 10,
+		col = $(document.importNode($('#temp-col').prop('content'), true)),
+		row = $(document.importNode($('#temp-team').prop('content'), true)),
+		cur = null;
+	for(var i = 0; i < COLS; i++)
+		col.clone().appendTo('#teams');
+	for(var i = 0; i < ROWS; i++)
+		row.clone().appendTo('#teams .row')
 	$('.team').each(function(i){
-		var div = $('<div>').appendTo(this);
+		var num = pad(i,2,'0');
+		var div = $(this).attr('id', 'team' + num)
+			.find('.team-num').text(num)
+			.end().find('.team-mem');
 		for(var j = 0; j < 6; j++){
 			var id = repo.key(['teams', i, j], '000')();
 			$('<div>').addClass('mem').data('id', id).append(image(id)).appendTo(div);
@@ -333,55 +349,8 @@ body{ overflow: hidden; }
 <body>
 <div class='container-fluid wrapper'>
 	<div class='row' id='teams'>
-		<div class='col-12 col-sm-6'><div class='row'>
-			<div class='col-12 col-lg-6'><div class='row'>
-				<div class='team col-12' id='team01'><span>01</span></div>
-				<div class='team col-12' id='team02'><span>02</span></div>
-				<div class='team col-12' id='team03'><span>03</span></div>
-				<div class='team col-12' id='team04'><span>04</span></div>
-				<div class='team col-12' id='team05'><span>05</span></div>
-				<div class='team col-12' id='team06'><span>06</span></div>
-				<div class='team col-12' id='team07'><span>07</span></div>
-				<div class='team col-12' id='team08'><span>08</span></div>
-				<div class='team col-12' id='team09'><span>09</span></div>
-				<div class='team col-12' id='team10'><span>10</span></div>
-			</div></div><div class='col-12 col-lg-6'><div class='row'>
-				<div class='team col-12' id='team11'><span>11</span></div>
-				<div class='team col-12' id='team12'><span>12</span></div>
-				<div class='team col-12' id='team13'><span>13</span></div>
-				<div class='team col-12' id='team14'><span>14</span></div>
-				<div class='team col-12' id='team15'><span>15</span></div>
-				<div class='team col-12' id='team16'><span>16</span></div>
-				<div class='team col-12' id='team17'><span>17</span></div>
-				<div class='team col-12' id='team18'><span>18</span></div>
-				<div class='team col-12' id='team19'><span>19</span></div>
-				<div class='team col-12' id='team20'><span>20</span></div>
-			</div></div>
-		</div></div><div class='col-12 col-sm-6'><div class='row'>
-			<div class='col-12 col-lg-6'><div class='row'>
-				<div class='team col-12' id='team21'><span>21</span></div>
-				<div class='team col-12' id='team22'><span>22</span></div>
-				<div class='team col-12' id='team23'><span>23</span></div>
-				<div class='team col-12' id='team24'><span>24</span></div>
-				<div class='team col-12' id='team25'><span>25</span></div>
-				<div class='team col-12' id='team26'><span>26</span></div>
-				<div class='team col-12' id='team27'><span>27</span></div>
-				<div class='team col-12' id='team28'><span>28</span></div>
-				<div class='team col-12' id='team29'><span>29</span></div>
-				<div class='team col-12' id='team30'><span>30</span></div>
-			</div></div><div class='col-12 col-lg-6'><div class='row'>
-				<div class='team col-12' id='team31'><span>31</span></div>
-				<div class='team col-12' id='team32'><span>32</span></div>
-				<div class='team col-12' id='team33'><span>33</span></div>
-				<div class='team col-12' id='team34'><span>34</span></div>
-				<div class='team col-12' id='team35'><span>35</span></div>
-				<div class='team col-12' id='team36'><span>36</span></div>
-				<div class='team col-12' id='team37'><span>37</span></div>
-				<div class='team col-12' id='team38'><span>38</span></div>
-				<div class='team col-12' id='team39'><span>39</span></div>
-				<div class='team col-12' id='team40'><span>40</span></div>
-			</div></div>
-		</div></div>
+		<template id='temp-col'><div class='col-md-6 col-xl-3'><div class='row'></div></div></template>
+		<template id='temp-team'><div class='team col-12'><span class='team-num'></span><div class='team-mem'></div></div></template>
 	</div>
 	<div class='row' id='add'>
 		<div class='col-6'>
