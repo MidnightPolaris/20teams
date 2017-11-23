@@ -83,7 +83,7 @@ $(function(){
 				return true;
 			if(temp[id] === undefined)
 				temp[id] = $();
-			temp[id].add(this);
+			temp[id] = temp[id].add(this);
 		});
 		for(var id in temp){
 			if(temp[id].parents('.team').length > 1)
