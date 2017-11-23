@@ -12,7 +12,7 @@ function Repo(ns){
 	this.ns = ns;
 	localStorage[ns] = localStorage[ns] || '{}';
 	this.val = JSON.parse(localStorage[ns]);
-}
+};
 Repo.prototype.key = function(key, def){
 	key = $.makeArray(key);
 	var temp = this.val, last = key.pop();
@@ -29,12 +29,12 @@ Repo.prototype.key = function(key, def){
 			? temp[last]
 			: temp[last] = v;
 	}
-}
-Repo.prototype.flush = function(){ localStorage[this.ns] = JSON.stringify(this.val); }
+};
+Repo.prototype.flush = function(){ localStorage[this.ns] = JSON.stringify(this.val); };
 Repo.prototype.clear = function(){
 	this.val = {};
 	this.flush();
-}
+};
 
 window.df = {};
 window.repo = new Repo('20teams');
@@ -74,14 +74,6 @@ function image(id){
 }
 
 $(function(){
-	Array.prototype.unique = function(){
-		this.sort();
-		var dup = [];
-		for(var i = this.length-1; i; i--){
-			if(this[i] == this[i+1]) dup.push(this.splice(i, 1)[0]);
-		}
-		return [this, dup];
-	};
 	function check(){
 		$('.warn').removeClass('warn');
 		var temp = {};
@@ -126,7 +118,7 @@ $(function(){
 	for(var i = 0; i < COLS; i++)
 		col.clone().appendTo('#teams');
 	for(var i = 0; i < ROWS; i++)
-		row.clone().appendTo('#teams .row')
+		row.clone().appendTo('#teams .row');
 	$('.team').each(function(i){
 		var num = pad(i+1,2,'0');
 		var div = $(this).attr('id', 'team' + num)
@@ -149,13 +141,13 @@ $(function(){
 		var $this = $(this);
 		$('.popover input')
 			.val($(this).data('id'))
-			.focus().select()
+			.focus().select();
 		$('.popover form').on('submit', function(e){
 			update($this, $(this).find('input').val());
 			$('.popover').popover('hide');
 			check();
 			return !!e.preventDefault();
-		})
+		});
 		$('.popover').on('mousedown', function(e){
 			e.stopPropagation();
 		});
