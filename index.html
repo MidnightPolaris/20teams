@@ -2,6 +2,7 @@
 <html>
 <head>
 <script type="text/javascript" src="//code.jquery.com/jquery-3.0.0.min.js"></script>
+<link rel="stylesheet" href="order.css">
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
 <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
@@ -119,19 +120,19 @@ $(function(){
 			str = pad + str;
 		return str;
 	}
-	var COLS = 4, ROWS = 10,
-		col = $(document.importNode($('#temp-col').prop('content'), true)),
-		row = $(document.importNode($('#temp-team').prop('content'), true)),
-		cur = null;
-	for(var i = 0; i < COLS; i++)
-		col.clone().appendTo('#teams');
-	for(var i = 0; i < ROWS; i++)
-		row.clone().appendTo('#teams .row');
+	var ttl  = 36,
+		cols = {'': 1, '-md': 2, '-lg': 3, '-xl': 4},
+		team = $(document.importNode($('#temp-team').prop('content'), true));
+	for(var i = 0; i < ttl; i++){
+		team.clone().appendTo('#teams');
+	}
 	$('.team').each(function(i){
-		var num = pad(i+1,2,'0');
-		var div = $(this).attr('id', 'team' + num)
-			.find('.team-num').text(num)
+		var div = $(this).find('.team-num').text(pad(i+1,2,'0'))
 			.end().find('.team-mem');
+		for(var size in cols){
+			$(this).addClass('col'+size+'-'+(12/cols[size]))
+				.addClass('order'+size+'-'+(i%(ttl/cols[size])+1));
+		}
 		for(var j = 0; j < 6; j++){
 			var id = repo.key(['teams', i, j], '000')();
 			$('<div>').addClass('mem').data('id', id).append(image(id)).appendTo(div);
@@ -389,7 +390,6 @@ body{ overflow: hidden; }
 <body>
 <div class='container-fluid wrapper'>
 	<div class='row' id='teams'>
-		<template id='temp-col'><div class='col-md-6 col-xl-3'><div class='row'></div></div></template>
 		<template id='temp-team'><div class='team col-12'><span class='team-num'></span><div class='team-mem'></div></div></template>
 	</div>
 	<div class='row' id='add'>
