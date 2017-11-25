@@ -1,28 +1,3 @@
-.order-13 { order: 13; }
-.order-14 { order: 14; }
-.order-15 { order: 15; }
-.order-16 { order: 16; }
-.order-17 { order: 17; }
-.order-18 { order: 18; }
-.order-19 { order: 19; }
-.order-20 { order: 20; }
-.order-21 { order: 21; }
-.order-22 { order: 22; }
-.order-23 { order: 23; }
-.order-24 { order: 24; }
-.order-25 { order: 25; }
-.order-26 { order: 26; }
-.order-27 { order: 27; }
-.order-28 { order: 28; }
-.order-29 { order: 29; }
-.order-30 { order: 30; }
-.order-31 { order: 31; }
-.order-32 { order: 32; }
-.order-33 { order: 33; }
-.order-34 { order: 34; }
-.order-35 { order: 35; }
-.order-36 { order: 36; }
-
 @media (min-width: 576px) {
   .order-sm-13 { order: 13; }
   .order-sm-14 { order: 14; }

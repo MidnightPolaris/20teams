@@ -121,7 +121,7 @@ $(function(){
 		return str;
 	}
 	var ttl  = 36,
-		cols = {'': 1, '-md': 2, '-lg': 3, '-xl': 4},
+		cols = {'-md': 2, '-lg': 3, '-xl': 4},
 		team = $(document.importNode($('#temp-team').prop('content'), true));
 	for(var i = 0; i < ttl; i++){
 		team.clone().appendTo('#teams');
@@ -390,7 +390,7 @@ body{ overflow: hidden; }
 <body>
 <div class='container-fluid wrapper'>
 	<div class='row' id='teams'>
-		<template id='temp-team'><div class='team col-12'><span class='team-num'></span><div class='team-mem'></div></div></template>
+		<template id='temp-team'><div class='team'><span class='team-num'></span><div class='team-mem'></div></div></template>
 	</div>
 	<div class='row' id='add'>
 		<div class='col-6'>
