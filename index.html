@@ -278,6 +278,14 @@ $(function(){
 		if(pass[k]) $('.team').eq(k).addClass('pass');
 	}
 	progress($('.pass').length, 30);
+	
+	// Delete
+	$('#btn-delete').on('click', function(){
+		var img = repo.key(['img'],{})();
+		repo.clear();
+		repo.key(['img'],{})(img);
+		location.reload();
+	});
 
 	check();
 });
@@ -397,7 +405,8 @@ body{ overflow: hidden; }
 			<div class='col-4'><div class="progress h-100 font-weight-bold" style='font-size: 1.2rem;'>
 				<div class="progress-bar bg-success w-0" role="progressbar"></div>
 			</div></div>
-			<div class='col-2' style='text-align: right'>
+			<div class='col-1'><button type='button' class='btn btn-danger btn-block' data-toggle="modal" data-target="#modal"><i class='fa fa-trash-o'></i></button></div>
+			<div class='col-1' style='text-align: right'>
 				<button type='button' id='btn-collapse' class='btn btn-default'><i class='fa fa-chevron-down'></i></button>
 				<button type='button' id='btn-expand' class='btn btn-default' style='display: none;'><i class='fa fa-chevron-up'></i></button>
 			</div>
@@ -416,5 +425,24 @@ body{ overflow: hidden; }
 		<button type="button" class="btn btn-danger btn-block mt-1"><i class="fa fa-trash-o"></i></button>
 	</form>
 </template>
+<div class="modal fade" id="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete all data</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        This cannot be undone. Are you sure?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Cancel</button>
+        <button id='btn-delete' type="button" class="btn btn-danger text-uppercase" data-dismiss="modal"><i class='fa fa-trash-o'></i></button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
