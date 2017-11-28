@@ -281,7 +281,7 @@ $(function(){
 		repo.key(['teams', i1], {})(repo.key(['teams', i2], {})());
 		repo.key(['teams', i2], {})(temp);
 
-		if(repo.key(['pass', i1])() != repo.key(['pass', i2])()){
+		if(repo.key(['pass', i1], false)() != repo.key(['pass', i2], false)()){
 			repo.key(['pass', i1])(!repo.key(['pass', i1])());
 			repo.key(['pass', i2])(!repo.key(['pass', i2])());
 			$('.team').eq(i1).add(this).toggleClass('pass');
