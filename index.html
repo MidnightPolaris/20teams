@@ -107,10 +107,10 @@ $(function(){
 			.attr('draggable', true)
 			.insertBefore('#btn-add');
 	}
-	function unpool(index){
-		repo.key(['pool'], [])().splice(index, 1);
+	function unpool(card){
+		repo.key(['pool'], [])().splice(card.index('.pool'), 1);
 		repo.flush();
-		$('.pool').eq(index).remove();
+		card.remove();
 	}
 
 	// Teams
@@ -185,7 +185,7 @@ $(function(){
 	$('#pool').on('inserted.bs.popover', '.pool', function(){
 		var $this = $(this);
 		$('.popover .btn-block').on('click', function(){
-			unpool($this.index('.pool'));
+			unpool($this);
 			$('.popover').popover('hide');
 		});
 		$('.popover input')
@@ -211,40 +211,82 @@ $(function(){
 
 	// Drag & drop
 	$('#pool').on('dragstart', '.pool', function(e){
-		e.originalEvent.dataTransfer.setData('text/plain', $(this).data('id'));
+		e.originalEvent.dataTransfer.setData('card', $(this).data('id'));
 		e.originalEvent.dataTransfer.effectAllowed = 'copyMove';
+		e.stopPropagation();
 	}).on('dragend', '.pool', function(e){
 		if(e.originalEvent.dataTransfer.dropEffect == 'move'){
-			repo.key('pool',[])().splice($(this).index(), 1);
-			repo.flush();
-			$(this).remove();
+			unpool($(this));
 		}
-		check();
 	});
-	$('#teams').on('dragstart', '.mem', function(e){
-		e.originalEvent.dataTransfer.setData('text/plain', $(this).data('id'));
+	$('.mem').on('dragstart', function(e){
+		e.originalEvent.dataTransfer.setData('card', $(this).data('id'));
 		e.originalEvent.dataTransfer.effectAllowed = 'copyMove';
-	}).on('dragend', '.mem', function(e){
+		e.stopPropagation();
+	}).on('dragend', function(e){
 		if(e.originalEvent.dataTransfer.dropEffect == 'move'){
 			update($(this), '000');
+			check();
 		}
-		check();
+	});
+	$('.team').on('dragstart', function(e){
+		e.originalEvent.dataTransfer.setData('team', $(this).index('.team'));
+		e.originalEvent.dataTransfer.effectAllowed = 'move';
+		e.stopPropagation();
 	});
 
-	$('body').on('dragover', '.mem, #teams, #pool', function(e){
-		$(this).addClass('drag');
-	}).on('dragover', '.mem, #teams, #pool', function(e){
+	$('.mem, #pool, .team').on('dragenter dragleave', function(e){
+		if(!$(e.target).closest(this).length || !$(e.relatedTarget).closest(this).length){
+			e.type += '*';
+			$(this).triggerHandler(e);
+		}
+	});
+
+	$('.mem, #pool').on('dragenter* dragleave* drop', function(e){
+		if(!e.originalEvent.dataTransfer.types.includes('card')) return true;
+		$(this).toggleClass('drag');
+	}).on('dragover', function(e){
+		if(!e.originalEvent.dataTransfer.types.includes('card')) return true;
 		e.originalEvent.dataTransfer.dropEffect = e.ctrlKey ? 'copy' : 'move';
 		return !!e.preventDefault();
-	}).on('dragleave', '.mem, #teams, #pool', function(e){
-		$(this).removeClass('drag');
-	}).on('drop', '.mem', function(e){
-		update($(this).removeClass('drag'), e.originalEvent.dataTransfer.getData('text/plain'));
-	}).on('drop', '#pool', function(e){
-		$(this).removeClass('drag');
-		var id = e.originalEvent.dataTransfer.getData('text/plain');
+	});
+	$('.mem').on('drop', function(e){
+		if(!e.originalEvent.dataTransfer.types.includes('card')) return true;
+		update($(this), e.originalEvent.dataTransfer.getData('card'));
+		check();
+	});
+	$('#pool').on('drop', function(e){
+		if(!e.originalEvent.dataTransfer.types.includes('card')) return true;
+		var id = e.originalEvent.dataTransfer.getData('card');
 		pool(id);
 		repo.key('pool', [])().push(id);
+		repo.flush();
+	});
+
+	$('.team').on('dragenter* dragleave* drop', function(e){
+		if(!e.originalEvent.dataTransfer.types.includes('team')) return true;
+		$(this).toggleClass('drag');
+	}).on('dragover', function(e){
+		if(!e.originalEvent.dataTransfer.types.includes('team')) return true;
+		return !!e.preventDefault();
+	}).on('drop', function(e){
+		if(!e.originalEvent.dataTransfer.types.includes('team')) return true;
+		var i1 = e.originalEvent.dataTransfer.getData('team'),
+			i2 = $(this).index('.team'),
+			mems = $(this).find('.team-mem');
+		$('.team-mem').eq(i1).insertAfter(mems);
+		$('.team').eq(i1).append(mems);
+
+		var temp = repo.key(['teams', i1], {})();
+		repo.key(['teams', i1], {})(repo.key(['teams', i2], {})());
+		repo.key(['teams', i2], {})(temp);
+
+		if(repo.key(['pass', i1])() != repo.key(['pass', i2])()){
+			repo.key(['pass', i1])(!repo.key(['pass', i1])());
+			repo.key(['pass', i2])(!repo.key(['pass', i2])());
+			$('.team').eq(i1).add(this).toggleClass('pass');
+		}
+
 		repo.flush();
 	});
 
@@ -339,8 +381,8 @@ body{ overflow: hidden; }
 .team-num{
 	display: block;
 	position: absolute;
-	left: 3px;
-	top: 3px;
+	left: 2px;
+	top: 2px;
 	width: 25px;
 	height: 20px;
 	border-radius: 10px;
@@ -356,6 +398,15 @@ body{ overflow: hidden; }
 	margin: 5px;
 	border: 1px solid silver;
 	border-radius: 5px;
+}
+.team.drag .team-num{
+	border: 2px solid #0CF;
+	color: #0CF;
+	line-height: 16px;
+}
+.team.drag .team-mem{
+	border: 2px solid #0CF;
+	margin: 4px;
 }
 .team.warn > *{
 	color:        hsl(0, 100%, 35%);
@@ -393,7 +444,7 @@ body{ overflow: hidden; }
 <div id='wrapper' class='container-fluid'>
 	<div id='upper'>
 		<div class='row' id='teams'>
-			<template id='temp-team'><div class='team'><span class='team-num'></span><div class='team-mem'></div></div></template>
+			<template id='temp-team'><div class='team' draggable='true'><span class='team-num'></span><div class='team-mem'></div></div></template>
 		</div>
 		<div class='row' id='add'>
 			<div class='col-6'>
