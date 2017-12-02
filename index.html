@@ -294,10 +294,12 @@ $(function(){
 	var aniSp = 500;
 	$('#btn-collapse').on('click', function(){
 		$('#upper').animate({flexShrink: 0}, aniSp);
+		$('#pool').delay(aniSp).queue(function(){ $(this).css({flexShrink: 1}).dequeue(); });
 		$('#btn-collapse').fadeOut(aniSp);
 		$('#btn-expand').delay(aniSp).fadeIn(aniSp);
 	});
 	$('#btn-expand').on('click', function(){
+		$('#pool').css({flexShrink: 0});
 		$('#upper').animate({flexShrink: 1}, aniSp);
 		$('#btn-expand').fadeOut(aniSp);
 		$('#btn-collapse').delay(aniSp).fadeIn(aniSp);
